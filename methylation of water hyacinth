@@ -1,0 +1,105 @@
+# methylation_water_hyacinth.py
+
+class WaterHyacinthMethylation:
+    def __init__(self, leaf_weight: float, methylation_agent_concentration: float, reaction_time: float, reaction_temperature: float, catalyst_efficiency: float):
+        """
+        Initialize the methylation process parameters.
+
+        :param leaf_weight: Weight of water hyacinth leaves (grams)
+        :param methylation_agent_concentration: Concentration of methylation agent (%)
+        :param reaction_time: Reaction time (hours)
+        :param reaction_temperature: Reaction temperature (°C)
+        :param catalyst_efficiency: Efficiency of the catalyst (%)
+        """
+        self.leaf_weight = leaf_weight
+        self.methylation_agent_concentration = methylation_agent_concentration
+        self.reaction_time = reaction_time
+        self.reaction_temperature = reaction_temperature
+        self.catalyst_efficiency = catalyst_efficiency
+        self.methylation_level = 0.0
+
+    def validate_inputs(self):
+        """
+        Validates inputs to ensure they are within realistic and non-negative ranges.
+        """
+        if self.leaf_weight <= 0:
+            raise ValueError("Leaf weight must be greater than 0.")
+        if not (0 < self.methylation_agent_concentration <= 100):
+            raise ValueError("Methylation agent concentration must be between 0 and 100%.")
+        if self.reaction_time <= 0:
+            raise ValueError("Reaction time must be greater than 0.")
+        if not (20 <= self.reaction_temperature <= 300):
+            raise ValueError("Reaction temperature must be between 20°C and 300°C.")
+        if not (0 < self.catalyst_efficiency <= 100):
+            raise ValueError("Catalyst efficiency must be between 0 and 100%.")
+
+    def prepare_sample(self):
+        """
+        Simulates sample preparation and adjusts leaf weight after pretreatment.
+
+        :return: Prepared leaf weight (grams).
+        """
+        prepared_weight = self.leaf_weight * 0.9  # Assume 10% loss during preparation
+        print(f"Prepared leaf weight: {prepared_weight:.2f} g")
+        return prepared_weight
+
+    def react(self, prepared_weight: float):
+        """
+        Simulates the methylation reaction.
+
+        :param prepared_weight: Weight of prepared leaf sample (grams)
+        :return: Methylation level achieved and unused methylation agent.
+        """
+        # Calculate the methylation potential based on reaction parameters
+        base_rate = (self.methylation_agent_concentration / 100) * (self.reaction_temperature / 100)
+        methylation_efficiency = base_rate * (1 - 0.1 ** self.reaction_time)  # Diminishing returns with time
+        methylation_level = prepared_weight * methylation_efficiency * (self.catalyst_efficiency / 100)
+        
+        # Calculate unused methylation agent
+        methylation_agent_used = prepared_weight * methylation_efficiency
+        unused_methylation_agent = (self.methylation_agent_concentration * self.leaf_weight / 100) - methylation_agent_used
+
+        print(f"Methylation level achieved: {methylation_level:.2f} units")
+        print(f"Unused methylation agent: {max(unused_methylation_agent, 0):.2f} g")
+        
+        return methylation_level, max(unused_methylation_agent, 0)
+
+    def process(self):
+        """
+        Full process pipeline for methylation of water hyacinth leaves.
+
+        :return: A dictionary containing methylation level and unused agent.
+        """
+        self.validate_inputs()
+        prepared_weight = self.prepare_sample()
+        methylation_level, unused_methylation_agent = self.react(prepared_weight)
+        return {
+            "methylation_level": methylation_level,
+            "unused_methylation_agent": unused_methylation_agent,
+        }
+
+
+if __name__ == "__main__":
+    # Example input values
+    leaf_weight = 100.0  # grams
+    methylation_agent_concentration = 20.0  # %
+    reaction_time = 3.0  # hours
+    reaction_temperature = 60.0  # °C
+    catalyst_efficiency = 85.0  # %
+
+    # Initialize the methylation process
+    methylation_process = WaterHyacinthMethylation(
+        leaf_weight=leaf_weight,
+        methylation_agent_concentration=methylation_agent_concentration,
+        reaction_time=reaction_time,
+        reaction_temperature=reaction_temperature,
+        catalyst_efficiency=catalyst_efficiency
+    )
+
+    # Run the process and capture results
+    results = methylation_process.process()
+
+    # Display results
+    print("\nFinal Results:")
+    print(f"Methylation Level: {results['methylation_level']:.2f} units")
+    print(f"Unused Methylation Agent: {results['unused_methylation_agent']:.2f} g")
